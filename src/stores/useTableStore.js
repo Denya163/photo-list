@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import axios from "axios";
 
 export const useTableStore = defineStore("table", () => {
@@ -7,12 +7,16 @@ export const useTableStore = defineStore("table", () => {
   const visibleRows = ref(30);
   const sortKey = ref(null);
   const sortOrder = ref(1);
+  const albumIds = ref("");
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        "https://jsonplaceholder.typicode.com/photos"
-      );
+      let url = "https://jsonplaceholder.typicode.com/photos";
+      const ids = albumIds.value.trim().split(" ").filter(Boolean);
+      if (ids.length) {
+        url += "?" + ids.map((id) => `albumId=${id}`).join("&");
+      }
+      const response = await axios.get(url);
       data.value = response.data;
     } catch (error) {
       console.error("Ошибка при загрузке данных:", error);
@@ -45,15 +49,15 @@ export const useTableStore = defineStore("table", () => {
     visibleRows.value = 30;
   };
 
-  onMounted(fetchData);
-
   return {
     data,
     visibleRows,
     sortKey,
     sortOrder,
+    albumIds,
     visibleData,
     loadMoreRows,
     sortBy,
+    fetchData,
   };
 });
