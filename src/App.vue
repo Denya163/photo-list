@@ -20,7 +20,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="row in visibleData"
+            v-for="row in tableStore.visibleData"
             :key="row.id"
             class="border-b hover:bg-gray-100"
           >
@@ -56,8 +56,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import axios from "axios";
+import { ref } from "vue";
+import { useTableStore } from "@/stores/useTableStore.js";
+
+const tableStore = useTableStore();
+const { visibleData, fetchData, sortBy, loadMoreRows } = tableStore;
+const tableWrapper = ref(null);
 
 const headers = {
   id: "Ид",
@@ -67,52 +71,11 @@ const headers = {
   thumbnailUrl: "Миниатюра",
 };
 
-const data = ref([]);
-const visibleRows = ref(30);
-const sortKey = ref(null);
-const sortOrder = ref(1);
-const tableWrapper = ref(null);
-
-const fetchData = async () => {
-  try {
-    const response = await axios.get(
-      "https://jsonplaceholder.typicode.com/photos"
-    );
-    data.value = response.data;
-  } catch (error) {
-    console.error("Ошибка при загрузке данных:", error);
-  }
-};
-
-const visibleData = computed(() => {
-  let sortedData = [...data.value].slice(0, visibleRows.value);
-  if (sortKey.value) {
-    sortedData.sort((a, b) => {
-      if (a[sortKey.value] < b[sortKey.value]) return -1 * sortOrder.value;
-      if (a[sortKey.value] > b[sortKey.value]) return 1 * sortOrder.value;
-      return 0;
-    });
-  }
-  return sortedData;
-});
-
 const handleScroll = () => {
   if (!tableWrapper.value) return;
   const { scrollTop, scrollHeight, clientHeight } = tableWrapper.value;
   if (scrollTop + clientHeight >= scrollHeight - 10) {
-    visibleRows.value += 20;
+    loadMoreRows();
   }
 };
-
-const sortBy = (key) => {
-  if (sortKey.value === key) {
-    sortOrder.value *= -1;
-  } else {
-    sortKey.value = key;
-    sortOrder.value = 1;
-  }
-  visibleRows.value = 30;
-};
-
-onMounted(fetchData);
 </script>
