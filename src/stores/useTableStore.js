@@ -8,18 +8,31 @@ export const useTableStore = defineStore("table", () => {
   const sortKey = ref(null);
   const sortOrder = ref(1);
   const albumIds = ref("");
+  const isLoading = ref(false);
+  const errorMessage = ref("");
 
   const fetchData = async () => {
     try {
+      isLoading.value = true;
+      errorMessage.value = ""; // Очистка ошибки перед новым запросом
+
       let url = "https://jsonplaceholder.typicode.com/photos";
       const ids = albumIds.value.trim().split(" ").filter(Boolean);
       if (ids.length) {
         url += "?" + ids.map((id) => `albumId=${id}`).join("&");
       }
+
       const response = await axios.get(url);
       data.value = response.data;
+
+      if (!data.value.length) {
+        errorMessage.value = "Нет данных для отображения.";
+      }
     } catch (error) {
+      errorMessage.value = "Ошибка загрузки данных. Попробуйте позже.";
       console.error("Ошибка при загрузке данных:", error);
+    } finally {
+      isLoading.value = false;
     }
   };
 
@@ -55,6 +68,8 @@ export const useTableStore = defineStore("table", () => {
     sortKey,
     sortOrder,
     albumIds,
+    isLoading,
+    errorMessage,
     visibleData,
     loadMoreRows,
     sortBy,

@@ -9,11 +9,22 @@
       />
       <button
         @click="tableStore.fetchData"
-        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+        :disabled="tableStore.isLoading"
+        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2 disabled:opacity-50"
       >
+        <span
+          v-if="tableStore.isLoading"
+          class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"
+        ></span>
         Поиск
       </button>
     </div>
+
+    <!-- Блок для отображения ошибки -->
+    <div v-if="tableStore.errorMessage" class="text-red-500 mb-4">
+      {{ tableStore.errorMessage }}
+    </div>
+
     <div
       class="w-[600px] h-[600px] overflow-y-auto border border-gray-300 bg-white shadow-md rounded-lg p-2"
       @scroll="handleScroll"
