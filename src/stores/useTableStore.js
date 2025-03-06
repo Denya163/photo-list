@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import axios from "axios";
 
 export const useTableStore = defineStore("table", () => {
@@ -7,9 +7,13 @@ export const useTableStore = defineStore("table", () => {
   const visibleRows = ref(30);
   const sortKey = ref(null);
   const sortOrder = ref(1);
-  const albumIds = ref("");
+  const albumIds = ref(localStorage.getItem("albumIds") || "");
   const isLoading = ref(false);
   const errorMessage = ref("");
+
+  watch(albumIds, (newVal) => {
+    localStorage.setItem("albumIds", newVal);
+  });
 
   const fetchData = async () => {
     try {
