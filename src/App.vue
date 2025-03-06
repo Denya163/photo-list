@@ -20,24 +20,23 @@
       </button>
     </div>
 
-    <!-- Блок для отображения ошибки -->
     <div v-if="tableStore.errorMessage" class="text-red-500 mb-4">
       {{ tableStore.errorMessage }}
     </div>
 
     <div
-      class="w-[600px] h-[600px] overflow-y-auto border border-gray-300 bg-white shadow-md rounded-lg p-2"
-      @scroll="handleScroll"
+      class="w-[600px] max-h-[550px] overflow-auto border border-gray-300 bg-white shadow-md rounded-lg"
       ref="tableWrapper"
+      @scroll="handleScroll"
     >
       <table class="w-full border-collapse">
-        <thead>
+        <thead class="sticky top-0 bg-white shadow-md z-10">
           <tr class="bg-gray-200 text-gray-700">
             <th
               v-for="(header, key) in headers"
               :key="key"
-              @click="tableStore.sortBy(key)"
-              class="p-3 border-b cursor-pointer hover:bg-gray-300 transition text-left truncate"
+              @click="sortTable(key)"
+              class="p-3 border-b cursor-pointer hover:bg-gray-300 transition text-left"
             >
               {{ header }}
             </th>
@@ -95,6 +94,13 @@ const headers = {
   thumbnailUrl: "Миниатюра",
 };
 
+const sortTable = (key) => {
+  tableStore.sortBy(key);
+  if (tableWrapper.value) {
+    tableWrapper.value.scrollTop = 0;
+  }
+};
+
 const handleScroll = () => {
   if (!tableWrapper.value) return;
   const { scrollTop, scrollHeight, clientHeight } = tableWrapper.value;
@@ -103,3 +109,20 @@ const handleScroll = () => {
   }
 };
 </script>
+
+<style scoped>
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+</style>

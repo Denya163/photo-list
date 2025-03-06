@@ -14,7 +14,7 @@ export const useTableStore = defineStore("table", () => {
   const fetchData = async () => {
     try {
       isLoading.value = true;
-      errorMessage.value = ""; // Очистка ошибки перед новым запросом
+      errorMessage.value = "";
 
       let url = "https://jsonplaceholder.typicode.com/photos";
       const ids = albumIds.value.trim().split(" ").filter(Boolean);
